@@ -1,0 +1,13 @@
+{
+  "name": "Ansuz Academy - Curso de Excel",
+  "short_name": "Ansuz Excel",
+  "description": "Curso completo de Excel para gente normal. 9 módulos, 34 temas, 100% práctico.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0D041F",
+  "theme_color": "#D4A843",
+  "orientation": "any",
+  "icons": [
+    { "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230D041F'/%3E%3Ctext x='32' y='42' font-family='serif' font-size='32' font-weight='bold' fill='%23D4A843' text-anchor='middle'%3EAA%3C/text%3E%3C/svg%3E", "sizes": "192x192", "type": "image/svg+xml" }
+  ]
+}

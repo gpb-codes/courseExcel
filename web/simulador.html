@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excel Simulador - Ansuz Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  :root {
+    --excel-green: #217346;
+    --excel-green-dark: #185a37;
+    --excel-green-light: #2b8a52;
+    --excel-green-bg: #e8f5e9;
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-tertiary: #0f3460;
+    --bg-surface: #1e2a4a;
+    --bg-hover: #2a3a5c;
+    --bg-cell: #ffffff;
+    --bg-cell-header: #e8ecf0;
+    --bg-cell-selected: #cce5ff;
+    --bg-cell-editing: #ffffff;
+    --border-color: #c4c7cc;
+    --border-light: #d4d7dc;
+    --border-header: #a0a4ab;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a4b8;
+    --text-cell: #1a1a2e;
+    --text-header: #3a3a4a;
+    --text-muted: #6b7280;
+    --accent-blue: #4a90d9;
+    --accent-orange: #e67e22;
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
+    --ribbon-height: 100px;
+    --formula-bar-height: 32px;
+    --header-height: 48px;
+    --status-bar-height: 24px;
+    --sheet-tab-height: 30px;
+    --row-header-width: 50px;
+    --col-header-height: 25px;
+    --cell-min-width: 80px;
+    --cell-height: 24px;
+    --grid-border: 1px solid #d0d4da;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --transition: all 0.15s ease;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font-family);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    user-select: none;
+  }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+  ::-webkit-scrollbar-thumb { background: #3a4a6a; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #4a5a7a; }
+  ::-webkit-scrollbar-corner { background: var(--bg-secondary); }
+
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ========== APP HEADER ========== */
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-height);
+    padding: 0 16px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+  }
+  .app-header-left { display: flex; align-items: center; gap: 12px; }
+  .app-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 700; font-size: 16px; color: #fff;
+    text-decoration: none; cursor: pointer;
+  }
+  .app-logo i { color: var(--excel-green-light); font-size: 20px; }
+  .app-logo span { letter-spacing: -0.3px; }
+  .app-logo .tag {
+    font-size: 10px; font-weight: 500;
+    background: rgba(255,255,255,0.08); color: var(--text-secondary);
+    padding: 2px 6px; border-radius: var(--radius-sm);
+    margin-left: 4px;
+  }
+  .app-header-center { display: flex; align-items: center; gap: 4px; }
+  .app-header-center .file-name {
+    font-size: 13px; font-weight: 500; color: var(--text-primary);
+    padding: 4px 12px; border-radius: var(--radius-sm);
+    cursor: pointer; transition: var(--transition);
+  }
+  .app-header-center .file-name:hover { background: var(--bg-hover); }
+  .app-header-right { display: flex; align-items: center; gap: 8px; }
+  .header-btn {
+    background: none; border: none; color: var(--text-secondary);
+    width: 32px; height: 32px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: var(--transition); font-size: 14px;
+  }
+  .header-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .header-btn .badge {
+    position: absolute; top: 2px; right: 2px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent-orange); font-size: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700;
+  }
+  .header-btn-wrap { position: relative; display: flex; }
+  .avatar-btn {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--excel-green); border: 2px solid var(--excel-green-light);
+    color: #fff; font-weight: 600; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: var(--transition);
+  }
+  .avatar-btn:hover { border-color: #fff; transform: scale(1.05); }
+
+  /* ========== RIBBON ========== */
+  .ribbon {
+    flex-shrink: 0;
+    background: var(--bg-surface);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    z-index: 10;
+  }
+  .ribbon-tabs {
+    display: flex; align-items: stretch;
+    padding: 0 8px; gap: 0;
+    height: 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .ribbon-tab {
+    padding: 0 16px; font-size: 12px; font-weight: 500;
+    color: var(--text-secondary); cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    border-bottom: 2px solid transparent;
+    transition: var(--transition);
+    background: none; border-top: none; border-left: none; border-right: none;
+    font-family: inherit;
+  }
+  .ribbon-tab:hover { color: var(--text-primary); background: var(--bg-hover); }
+  .ribbon-tab.active {
+    color: var(--excel-green-light);
+    border-bottom-color: var(--excel-green-light);
+  }
+  .ribbon-tab i { font-size: 13px; }
+  .ribbon-body {
+    display: flex; align-items: center;
+    padding: 4px 8px; gap: 2px;
+    height: calc(var(--ribbon-height) - 32px);
+    overflow-x: auto;
+  }
+  .ribbon-body::-webkit-scrollbar { height: 3px; }
+  .ribbon-group {
+    display: flex; align-items: center; gap: 2px;
+    padding: 0 8px;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .ribbon-group:last-child { border-right: none; }
+  .ribbon-group-label {
+    position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+    font-size: 9px; color: var(--text-muted); white-space: nowrap;
+    pointer-events: none;
+  }
+  .ribbon-group-inner {
+    position: relative;
+    display: flex; align-items: center; gap: 1px;
+    padding-bottom: 14px;
+  }
+  .ribbon-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; padding: 4px 6px; min-width: 44px;
+    background: none; border: none; color: var(--text-secondary);
+    border-radius: var(--radius-sm); cursor: pointer;
+    transition: var(--transition); font-family: inherit; font-size: 10px;
+  }
+  .ribbon-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .ribbon-btn:active { background: rgba(255,255,255,0.08); }
+  .ribbon-btn i { font-size: 16px; display: block; }
+  .ribbon-btn .label { font-size: 9px; line-height: 1.1; white-space: nowrap; }
+  .ribbon-btn.disabled { opacity: 0.35; cursor: not-allowed; }
+  .ribbon-btn.disabled:hover { background: none; }
+  .ribbon-divider {
+    width: 1px; height: 36px;
+    background: rgba(255,255,255,0.06);
+    margin: 0 2px;
+  }
+  .ribbon-dropdown {
+    display: flex; align-items: center; gap: 4px;
+    padding: 2px 8px; background: none; border: none;
+    color: var(--text-secondary); cursor: pointer;
+    border-radius: var(--radius-sm); transition: var(--transition);
+    font-family: inherit; font-size: 11px;
+  }
+  .ribbon-dropdown:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .ribbon-dropdown i { font-size: 10px; }
+  .ribbon-dropdown .preview {
+    width: 24px; height: 16px; border: 1px solid var(--border-color);
+    border-radius: 2px; display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: var(--text-muted);
+    background: #fff;
+  }
+
+  /* ========== FORMULA BAR ========== */
+  .formula-bar {
+    display: flex; align-items: center;
+    height: var(--formula-bar-height);
+    background: var(--bg-surface);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+    padding: 0;
+  }
+  .formula-bar .cell-ref {
+    width: 72px; min-width: 72px; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    color: var(--text-primary); background: rgba(255,255,255,0.04);
+    border-right: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer; transition: var(--transition);
+  }
+  .formula-bar .cell-ref:hover { background: var(--bg-hover); }
+  .formula-bar .function-btn {
+    width: 28px; min-width: 28px; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: none; color: var(--text-secondary);
+    cursor: pointer; transition: var(--transition); font-size: 12px;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .formula-bar .function-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .formula-bar .formula-input {
+    flex: 1; height: 100%;
+    background: none; border: none; outline: none;
+    padding: 0 12px;
+    font-family: var(--font-mono); font-size: 12px;
+    color: var(--text-primary);
+  }
+  .formula-bar .formula-input::placeholder { color: var(--text-muted); }
+
+  /* ========== GRID WRAPPER ========== */
+  .grid-wrapper {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-secondary);
+  }
+
+  .grid-container {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    overflow: auto;
+  }
+
+  .grid-table {
+    display: grid;
+    grid-template-columns: var(--row-header-width) repeat(26, var(--cell-min-width));
+    grid-auto-rows: var(--col-header-height);
+    position: relative;
+    background: var(--bg-secondary);
+  }
+
+  /* ========== COLUMN HEADERS ========== */
+  .col-header {
+    background: var(--bg-cell-header);
+    color: var(--text-header);
+    font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    border-right: var(--grid-border);
+    border-bottom: var(--grid-border);
+    position: sticky; top: 0; z-index: 3;
+    cursor: pointer;
+    transition: background 0.1s;
+    user-select: none;
+  }
+  .col-header:hover { background: #d5dbe0; }
+  .col-header:active { background: #c0c6cc; }
+  .col-header.resize-col {
+    position: absolute; right: -3px; top: 0; bottom: 0;
+    width: 6px; cursor: col-resize; z-index: 5;
+    background: transparent;
+  }
+  .col-header.resize-col:hover,
+  .col-header.resize-col:active {
+    background: var(--excel-green-light);
+  }
+
+  /* ========== ROW HEADERS ========== */
+  .row-header {
+    background: var(--bg-cell-header);
+    color: var(--text-header);
+    font-size: 11px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    border-right: var(--grid-border);
+    border-bottom: var(--grid-border);
+    position: sticky; left: 0; z-index: 2;
+    cursor: pointer;
+    transition: background 0.1s;
+    user-select: none;
+  }
+  .row-header:hover { background: #d5dbe0; }
+  .row-header:active { background: #c0c6cc; }
+  .row-header.resize-row {
+    position: absolute; bottom: -3px; left: 0; right: 0;
+    height: 6px; cursor: row-resize; z-index: 5;
+    background: transparent;
+  }
+  .row-header.resize-row:hover,
+  .row-header.resize-row:active {
+    background: var(--excel-green-light);
+  }
+
+  /* ========== CORNER BUTTON ========== */
+  .grid-corner {
+    background: var(--bg-cell-header);
+    border-right: var(--grid-border);
+    border-bottom: var(--grid-border);
+    position: sticky; top: 0; left: 0; z-index: 4;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.1s;
+  }
+  .grid-corner:hover { background: #d5dbe0; }
+  .grid-corner:active { background: #c0c6cc; }
+  .grid-corner i { font-size: 11px; color: var(--text-muted); }
+
+  /* ========== CELLS ========== */
+  .cell {
+    background: var(--bg-cell);
+    color: var(--text-cell);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 0 4px;
+    border-right: var(--grid-border);
+    border-bottom: var(--grid-border);
+    display: flex; align-items: center;
+    cursor: cell;
+    transition: background 0.05s;
+    outline: none;
+    min-height: var(--cell-height);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .cell:hover { background: #f5f7fa; }
+  .cell.selected {
+    background: var(--bg-cell-selected);
+    outline: 2px solid var(--excel-green);
+    outline-offset: -1px;
+    z-index: 1;
+  }
+  .cell.editing {
+    background: var(--bg-cell-editing);
+    outline: 2px solid var(--accent-blue);
+    outline-offset: -1px;
+    z-index: 2;
+    padding: 0 2px;
+  }
+  .cell.editing:focus {
+    box-shadow: inset 0 0 0 1px var(--accent-blue);
+  }
+  .cell.bold { font-weight: 700; }
+  .cell.italic { font-style: italic; }
+  .cell.underline { text-decoration: underline; }
+  .cell.text-left { justify-content: flex-start; }
+  .cell.text-center { justify-content: center; }
+  .cell.text-right { justify-content: flex-end; }
+  .cell.number { justify-content: flex-end; }
+  .cell.formula { color: #1a6d1a; }
+  .cell.error { color: #d32f2f; }
+  .cell .error-indicator {
+    position: absolute; top: 1px; right: 1px;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 0 6px 6px 0;
+    border-color: transparent #d32f2f transparent transparent;
+  }
+
+  /* ========== FILL HANDLE ========== */
+  .fill-handle {
+    position: absolute;
+    bottom: -3px; right: -3px;
+    width: 8px; height: 8px;
+    background: var(--excel-green);
+    border: 1px solid #fff;
+    cursor: crosshair;
+    z-index: 10;
+    transition: transform 0.1s;
+  }
+  .fill-handle:hover { transform: scale(1.3); }
+
+  /* ========== RESIZE LINE ========== */
+  .resize-line {
+    position: absolute; z-index: 100;
+    background: var(--excel-green-light);
+    pointer-events: none;
+  }
+  .resize-line.horizontal { height: 2px; cursor: row-resize; }
+  .resize-line.vertical { width: 2px; cursor: col-resize; }
+
+  /* ========== CONTEXT MENU ========== */
+  .context-menu {
+    position: fixed; z-index: 1000;
+    background: var(--bg-surface);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+    padding: 4px 0;
+    display: none;
+    backdrop-filter: blur(8px);
+  }
+  .context-menu.open { display: block; }
+  .context-menu .menu-item {
+    display: flex; align-items: center;
+    gap: 10px; padding: 6px 16px;
+    color: var(--text-primary); font-size: 12px;
+    cursor: pointer; transition: var(--transition);
+    border: none; background: none; width: 100%;
+    text-align: left; font-family: inherit;
+  }
+  .context-menu .menu-item:hover { background: var(--bg-hover); }
+  .context-menu .menu-item i {
+    width: 16px; text-align: center; font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .context-menu .menu-item .shortcut {
+    margin-left: auto; color: var(--text-muted); font-size: 11px;
+  }
+  .context-menu .menu-divider {
+    height: 1px; background: rgba(255,255,255,0.06);
+    margin: 4px 8px;
+  }
+  .context-menu .menu-item.danger { color: #ef5350; }
+  .context-menu .menu-item.danger i { color: #ef5350; }
+  .context-menu .menu-item.danger:hover { background: rgba(239,83,80,0.12); }
+
+  /* ========== SHEET BAR ========== */
+  .sheet-bar {
+    display: flex; align-items: center;
+    height: var(--sheet-tab-height);
+    background: var(--bg-surface);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .sheet-bar .sheet-scroll {
+    display: flex; align-items: center;
+    padding: 0 4px; gap: 2px;
+    background: var(--bg-surface);
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+  .sheet-scroll-btn {
+    background: none; border: none; color: var(--text-secondary);
+    width: 22px; height: 22px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: var(--transition); font-size: 10px;
+  }
+  .sheet-scroll-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .sheet-tabs {
+    display: flex; align-items: stretch;
+    flex: 1; overflow: hidden;
+    padding: 0;
+  }
+  .sheet-tab {
+    display: flex; align-items: center; gap: 6px;
+    padding: 0 12px; min-width: 80px; max-width: 160px;
+    font-size: 11px; font-weight: 500;
+    color: var(--text-secondary); cursor: pointer;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    transition: var(--transition);
+    background: rgba(255,255,255,0.02);
+    border-top: 2px solid transparent;
+    font-family: inherit;
+  }
+  .sheet-tab:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .sheet-tab.active {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-top-color: var(--excel-green-light);
+  }
+  .sheet-tab .sheet-icon {
+    font-size: 10px; color: var(--excel-green-light);
+  }
+  .sheet-tab .sheet-name {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .sheet-tab .sheet-close {
+    margin-left: auto; font-size: 10px; color: var(--text-muted);
+    background: none; border: none; cursor: pointer;
+    padding: 1px 3px; border-radius: 2px; opacity: 0;
+    transition: var(--transition); font-family: inherit;
+  }
+  .sheet-tab:hover .sheet-close { opacity: 0.7; }
+  .sheet-tab .sheet-close:hover { opacity: 1; background: rgba(255,255,255,0.08); }
+  .sheet-add-btn {
+    background: none; border: none; color: var(--text-secondary);
+    width: 28px; min-width: 28px; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: var(--transition); font-size: 13px;
+  }
+  .sheet-add-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+  /* ========== STATUS BAR ========== */
+  .status-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    height: var(--status-bar-height);
+    padding: 0 12px;
+    background: var(--bg-surface);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .status-bar-left, .status-bar-right {
+    display: flex; align-items: center; gap: 16px;
+  }
+  .status-bar .status-item {
+    display: flex; align-items: center; gap: 4px;
+  }
+  .status-bar .status-item i { font-size: 11px; }
+  .status-bar .mode-indicator {
+    font-weight: 600; color: var(--text-primary);
+  }
+  .status-bar .zoom-level {
+    font-family: var(--font-mono); font-size: 11px;
+    cursor: pointer; padding: 1px 6px; border-radius: var(--radius-sm);
+    transition: var(--transition);
+  }
+  .status-bar .zoom-level:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .status-bar .progress-bar {
+    width: 80px; height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px; overflow: hidden;
+  }
+  .status-bar .progress-bar .fill {
+    height: 100%; width: 0%;
+    background: var(--excel-green-light);
+    border-radius: 2px; transition: width 0.3s;
+  }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 768px) {
+    :root {
+      --ribbon-height: 72px;
+      --header-height: 40px;
+      --row-header-width: 38px;
+      --cell-min-width: 64px;
+      --cell-height: 22px;
+    }
+    .ribbon-tab { padding: 0 10px; font-size: 11px; }
+    .ribbon-btn { min-width: 36px; padding: 2px 4px; }
+    .ribbon-btn i { font-size: 14px; }
+    .ribbon-group { padding: 0 4px; }
+    .app-header { padding: 0 10px; }
+    .app-logo .tag { display: none; }
+    .formula-bar .cell-ref { width: 56px; min-width: 56px; font-size: 11px; }
+    .grid-table {
+      grid-template-columns: var(--row-header-width) repeat(26, var(--cell-min-width));
+    }
+    .status-bar { font-size: 10px; padding: 0 8px; }
+    .status-bar-left, .status-bar-right { gap: 8px; }
+    .header-btn.header-btn-hide-mobile { display: none; }
+  }
+
+  @media (max-width: 480px) {
+    :root {
+      --ribbon-height: 56px;
+      --header-height: 36px;
+      --row-header-width: 32px;
+      --cell-min-width: 52px;
+      --cell-height: 20px;
+    }
+    .ribbon-body { gap: 0; padding: 2px 4px; }
+    .ribbon-group { padding: 0 3px; }
+    .ribbon-btn { min-width: 28px; padding: 1px 2px; }
+    .ribbon-btn i { font-size: 12px; }
+    .ribbon-btn .label { display: none; }
+    .ribbon-tab { padding: 0 8px; font-size: 10px; }
+    .ribbon-tab i { font-size: 11px; }
+    .app-logo span { font-size: 14px; }
+    .formula-bar .cell-ref { width: 44px; min-width: 44px; font-size: 10px; }
+    .formula-bar .formula-input { font-size: 11px; }
+    .grid-table {
+      grid-template-columns: var(--row-header-width) repeat(26, var(--cell-min-width));
+    }
+    .col-header { font-size: 9px; }
+    .row-header { font-size: 9px; }
+    .cell { font-size: 10px; padding: 0 2px; }
+    .sheet-tab { min-width: 60px; padding: 0 8px; font-size: 10px; }
+  }
+
+  /* ========== UTILITY ========== */
+  .hidden { display: none !important; }
+  .fade-in { animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ========== DARK MODE TOGGLE SUPPORT ========== */
+  .cell.dark-header { background: #2d2d3a; color: #e0e0e0; }
+  .cell.dark-cell { background: #1e1e2e; color: #e0e0e0; border-color: #3a3a4a; }
+</style>
+</head>
+<body>
+<div class="app-container">
+
+  <!-- ===== APP HEADER ===== -->
+  <header class="app-header">
+    <div class="app-header-left">
+      <a class="app-logo" href="#">
+        <i class="fas fa-table"></i>
+        <span>Excel Simulador</span>
+        <span class="tag">Ansuz Academy</span>
+      </a>
+    </div>
+    <div class="app-header-center">
+      <span class="file-name"><i class="fas fa-file-excel" style="margin-right:6px;color:var(--excel-green-light);"></i>Libro1.xlsx</span>
+    </div>
+    <div class="app-header-right">
+      <button class="header-btn header-btn-hide-mobile" title="Deshacer" aria-label="Deshacer">
+        <i class="fas fa-undo"></i>
+      </button>
+      <button class="header-btn header-btn-hide-mobile" title="Rehacer" aria-label="Rehacer">
+        <i class="fas fa-redo"></i>
+      </button>
+      <button class="header-btn header-btn-hide-mobile" title="Compartir" aria-label="Compartir">
+        <i class="fas fa-share-alt"></i>
+      </button>
+      <button class="header-btn header-btn-hide-mobile" title="Notificaciones" aria-label="Notificaciones">
+        <span class="header-btn-wrap">
+          <i class="fas fa-bell"></i>
+          <span class="badge">3</span>
+        </span>
+      </button>
+      <button class="avatar-btn" title="Usuario" aria-label="Usuario">GA</button>
+    </div>
+  </header>
+
+  <!-- ===== RIBBON ===== -->
+  <div class="ribbon">
+    <div class="ribbon-tabs">
+      <button class="ribbon-tab active"><i class="fas fa-home"></i> Inicio</button>
+      <button class="ribbon-tab"><i class="fas fa-insert"></i> Insertar</button>
+      <button class="ribbon-tab"><i class="fas fa-pen"></i> Diseño</button>
+      <button class="ribbon-tab"><i class="fas fa-file-alt"></i> Fórmulas</button>
+      <button class="ribbon-tab"><i class="fas fa-chart-bar"></i> Datos</button>
+      <button class="ribbon-tab"><i class="fas fa-search"></i> Revisar</button>
+      <button class="ribbon-tab"><i class="fas fa-eye"></i> Vista</button>
+    </div>
+    <div class="ribbon-body">
+      <!-- Portapapeles -->
+      <div class="ribbon-group">
+        <div class="ribbon-group-inner">
+          <button class="ribbon-btn" title="Pegar">
+            <i class="fas fa-paste"></i>
+            <span class="label">Pegar</span>
+          </button>
+          <button class="ribbon-btn" title="Cortar">
+            <i class="fas fa-cut"></i>
+            <span class="label">Cortar</span>
+          </button>
+          <button class="ribbon-btn" title="Copiar">
+            <i class="fas fa-copy"></i>
+            <span class="label">Copiar</span>
+          </button>
+          <button class="ribbon-btn" title="Copiar formato">
+            <i class="fas fa-paint-brush"></i>
+            <span class="label">Formato</span>
+          </button>
+          <span class="ribbon-group-label">Portapapeles</span>
+        </div>
+      </div>
+      <!-- Fuente -->
+      <div class="ribbon-group">
+        <div class="ribbon-group-inner">
+          <button class="ribbon-btn" title="Negrita">
+            <i class="fas fa-bold"></i>
+            <span class="label">Negrita</span>
+          </button>
+          <button class="ribbon-btn" title="Cursiva">
+            <i class="fas fa-italic"></i>
+            <span class="label">Cursiva</span>
+          </button>
+          <button class="ribbon-btn" title="Subrayado">
+            <i class="fas fa-underline"></i>
+            <span class="label">Subrayado</span>
+          </button>
+          <div class="ribbon-divider"></div>
+          <button class="ribbon-btn" title="Color de relleno">
+            <i class="fas fa-fill-drip"></i>
+            <span class="label">Relleno</span>
+          </button>
+          <button class="ribbon-btn" title="Color de fuente">
+            <i class="fas fa-font"></i>
+            <span class="label">Fuente</span>
+          </button>
+          <button class="ribbon-btn" title="Bordes">
+            <i class="fas fa-border-all"></i>
+            <span class="label">Bordes</span>
+          </button>
+          <span class="ribbon-group-label">Fuente</span>
+        </div>
+      </div>
+      <!-- Alineación -->
+      <div class="ribbon-group">
+        <div class="ribbon-group-inner">
+          <button class="ribbon-btn" title="Alinear a la izquierda">
+            <i class="fas fa-align-left"></i>
+            <span class="label">Izquierda</span>
+          </button>
+          <button class="ribbon-btn" title="Centrar">
+            <i class="fas fa-align-center"></i>
+            <span class="label">Centro</span>
+          </button>
+          <button class="ribbon-btn" title="Alinear a la derecha">
+            <i class="fas fa-align-right"></i>
+            <span class="label">Derecha</span>
+          </button>
+          <div class="ribbon-divider"></div>
+          <button class="ribbon-btn" title="Combinar y centrar">
+            <i class="fas fa-object-group"></i>
+            <span class="label">Combinar</span>
+          </button>
+          <button class="ribbon-btn" title="Ajustar texto">
+            <i class="fas fa-text-height"></i>
+            <span class="label">Ajustar</span>
+          </button>
+          <span class="ribbon-group-label">Alineación</span>
+        </div>
+      </div>
+      <!-- Número -->
+      <div class="ribbon-group">
+        <div class="ribbon-group-inner">
+          <button class="ribbon-btn" title="Formato número">
+            <i class="fas fa-percent"></i>
+            <span class="label">%</span>
+          </button>
+          <button class="ribbon-btn" title="Separador de miles">
+            <i class="fas fa-comma"></i>
+            <span class="label">,</span>
+          </button>
+          <button class="ribbon-btn" title="Aumentar decimales">
+            <i class="fas fa-plus-circle"></i>
+            <span class="label">.00</span>
+          </button>
+          <button class="ribbon-btn" title="Disminuir decimales">
+            <i class="fas fa-minus-circle"></i>
+            <span class="label">.00</span>
+          </button>
+          <span class="ribbon-group-label">Número</span>
+        </div>
+      </div>
+      <!-- Estilos -->
+      <div class="ribbon-group">
+        <div class="ribbon-group-inner">
+          <button class="ribbon-btn" title="Formato condicional">
+            <i class="fas fa-fill"></i>
+            <span class="label">Condicional</span>
+          </button>
+          <button class="ribbon-btn" title="Dar formato como tabla">
+            <i class="fas fa-table"></i>
+            <span class="label">Tabla</span>
+          </button>
+          <button class="ribbon-btn" title="Estilos de celda">
+            <i class="fas fa-palette"></i>
+            <span class="label">Estilos</span>
+          </button>
+          <span class="ribbon-group-label">Estilos</span>
+        </div>
+      </div>
+      <!-- Celdas -->
+      <div class="ribbon-group">
+        <div class="ribbon-group-inner">
+          <button class="ribbon-btn" title="Insertar">
+            <i class="fas fa-plus-square"></i>
+            <span class="label">Insertar</span>
+          </button>
+          <button class="ribbon-btn" title="Eliminar">
+            <i class="fas fa-minus-square"></i>
+            <span class="label">Eliminar</span>
+          </button>
+          <button class="ribbon-btn" title="Formato">
+            <i class="fas fa-edit"></i>
+            <span class="label">Formato</span>
+          </button>
+          <span class="ribbon-group-label">Celdas</span>
+        </div>
+      </div>
+      <!-- Edición -->
+      <div class="ribbon-group">
+        <div class="ribbon-group-inner">
+          <button class="ribbon-btn" title="Ordenar y filtrar">
+            <i class="fas fa-sort"></i>
+            <span class="label">Filtro</span>
+          </button>
+          <button class="ribbon-btn" title="Buscar y seleccionar">
+            <i class="fas fa-search"></i>
+            <span class="label">Buscar</span>
+          </button>
+          <button class="ribbon-btn" title="SUM">
+            <i class="fas fa-sigma"></i>
+            <span class="label">Suma</span>
+          </button>
+          <span class="ribbon-group-label">Edición</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FORMULA BAR ===== -->
+  <div class="formula-bar">
+    <div class="cell-ref" id="cellRef">A1</div>
+    <button class="function-btn" title="Insertar función" aria-label="Insertar función">
+      <i class="fas fa-fx"></i>
+    </button>
+    <input class="formula-input" id="formulaInput" type="text" placeholder="Ingrese valor o fórmula..." spellcheck="false" autocomplete="off">
+  </div>
+
+  <!-- ===== GRID WRAPPER ===== -->
+  <div class="grid-wrapper">
+    <div class="grid-container" id="gridContainer">
+      <div class="grid-table" id="gridTable">
+        <!-- Los encabezados y celdas se generarán dinámicamente con JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CONTEXT MENU ===== -->
+  <div class="context-menu" id="contextMenu">
+    <button class="menu-item" data-action="cut"><i class="fas fa-cut"></i> Cortar <span class="shortcut">Ctrl+X</span></button>
+    <button class="menu-item" data-action="copy"><i class="fas fa-copy"></i> Copiar <span class="shortcut">Ctrl+C</span></button>
+    <button class="menu-item" data-action="paste"><i class="fas fa-paste"></i> Pegar <span class="shortcut">Ctrl+V</span></button>
+    <div class="menu-divider"></div>
+    <button class="menu-item" data-action="insert"><i class="fas fa-plus-square"></i> Insertar</button>
+    <button class="menu-item" data-action="delete"><i class="fas fa-minus-square"></i> Eliminar</button>
+    <button class="menu-item" data-action="clear"><i class="fas fa-eraser"></i> Limpiar contenido</button>
+    <div class="menu-divider"></div>
+    <button class="menu-item" data-action="format"><i class="fas fa-paint-brush"></i> Formato de celdas...</button>
+    <button class="menu-item" data-action="dropdown"><i class="fas fa-list"></i> Validación de datos...</button>
+    <div class="menu-divider"></div>
+    <button class="menu-item danger" data-action="deleteAll"><i class="fas fa-trash"></i> Eliminar todo</button>
+  </div>
+
+  <!-- ===== SHEET BAR ===== -->
+  <div class="sheet-bar">
+    <div class="sheet-scroll">
+      <button class="sheet-scroll-btn" title="Desplazar a la primera hoja"><i class="fas fa-angle-double-left"></i></button>
+      <button class="sheet-scroll-btn" title="Desplazar a la izquierda"><i class="fas fa-angle-left"></i></button>
+      <button class="sheet-scroll-btn" title="Desplazar a la derecha"><i class="fas fa-angle-right"></i></button>
+      <button class="sheet-scroll-btn" title="Desplazar a la última hoja"><i class="fas fa-angle-double-right"></i></button>
+    </div>
+    <div class="sheet-tabs" id="sheetTabs">
+      <button class="sheet-tab active" data-index="0">
+        <i class="fas fa-file-excel sheet-icon"></i>
+        <span class="sheet-name">Hoja1</span>
+        <span class="sheet-close">&times;</span>
+      </button>
+      <button class="sheet-tab" data-index="1">
+        <i class="fas fa-file-excel sheet-icon"></i>
+        <span class="sheet-name">Hoja2</span>
+        <span class="sheet-close">&times;</span>
+      </button>
+      <button class="sheet-tab" data-index="2">
+        <i class="fas fa-file-excel sheet-icon"></i>
+        <span class="sheet-name">Hoja3</span>
+        <span class="sheet-close">&times;</span>
+      </button>
+    </div>
+    <button class="sheet-add-btn" title="Insertar nueva hoja" aria-label="Nueva hoja">
+      <i class="fas fa-plus-circle"></i>
+    </button>
+  </div>
+
+  <!-- ===== STATUS BAR ===== -->
+  <div class="status-bar">
+    <div class="status-bar-left">
+      <span class="status-item mode-indicator" id="modeIndicator">Listo</span>
+      <span class="status-item" id="sumIndicator"><i class="fas fa-equals"></i> Suma = 0</span>
+      <span class="status-item" id="avgIndicator"><i class="fas fa-chart-line"></i> Promedio</span>
+      <span class="status-item" id="countIndicator"><i class="fas fa-hashtag"></i> Cuenta</span>
+    </div>
+    <div class="status-bar-right">
+      <span class="status-item progress-bar"><span class="fill" id="progressFill" style="width:0%"></span></span>
+      <span class="status-item zoom-level" id="zoomLevel">100%</span>
+    </div>
+  </div>
+
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const COLS = 26, ROWS = 30;
+  const COL_LETTERS = Array.from({ length: COLS }, (_, i) => String.fromCharCode(65 + i));
+
+  const gridTable = document.getElementById('gridTable');
+  const cellRef = document.getElementById('cellRef');
+  const formulaInput = document.getElementById('formulaInput');
+  const contextMenu = document.getElementById('contextMenu');
+  const modeIndicator = document.getElementById('modeIndicator');
+  const sumIndicator = document.getElementById('sumIndicator');
+  const countIndicator = document.getElementById('countIndicator');
+  const avgIndicator = document.getElementById('avgIndicator');
+  const sheetTabs = document.getElementById('sheetTabs');
+
+  const cells = {};
+  let selectedCell = null, editing = false, clipboard = null, sheetCount = 3;
+
+  const cellKey = (col, row) => COL_LETTERS[col] + row;
+  const parseCellKey = (key) => {
+    const m = key.match(/^([A-Z])(\d+)$/);
+    return m ? { col: m[1].charCodeAt(0) - 65, row: +m[2] } : null;
+  };
+  const getCell = (col, row) => {
+    const k = cellKey(col, row);
+    if (!cells[k]) cells[k] = { value: '', formula: '', bold: false, italic: false, underline: false, align: 'left' };
+    return cells[k];
+  };
+  const getCellEl = (col, row) => document.querySelector(`[data-cell="${cellKey(col, row)}"]`);
+  const isNumeric = (v) => v !== '' && !isNaN(v) && isFinite(v);
+
+  // Build grid
+  const buildGrid = () => {
+    let html = '<div class="grid-corner"><i class="fas fa-caret-down"></i></div>';
+    for (let c = 0; c < COLS; c++) html += `<div class="col-header" data-col="${c}">${COL_LETTERS[c]}</div>`;
+    for (let r = 1; r <= ROWS; r++) {
+      html += `<div class="row-header" data-row="${r}">${r}</div>`;
+      for (let c = 0; c < COLS; c++)
+        html += `<div class="cell" data-cell="${cellKey(c, r)}" data-col="${c}" data-row="${r}" tabindex="-1"></div>`;
+    }
+    gridTable.innerHTML = html;
+  };
+
+  // Render cell
+  const renderCell = (col, row) => {
+    const el = getCellEl(col, row);
+    if (!el) return;
+    const cell = getCell(col, row);
+    const display = cell.formula && cell.formula.startsWith('=') ? cell.value : cell.value;
+    el.textContent = display;
+    el.className = 'cell';
+    if (cell.bold) el.classList.add('bold');
+    if (cell.italic) el.classList.add('italic');
+    if (cell.underline) el.classList.add('underline');
+    el.classList.add(`text-${cell.align}`);
+    if (display !== '' && isNumeric(display)) el.classList.add('number');
+    if (selectedCell && selectedCell.col === col && selectedCell.row === row) {
+      el.classList.add('selected');
+      if (editing) el.classList.add('editing');
+    }
+  };
+
+  const renderAllCells = () => { for (let r = 1; r <= ROWS; r++) for (let c = 0; c < COLS; c++) renderCell(c, r); };
+
+  // Fill handle
+  const updateFillHandle = (col, row) => {
+    const old = document.querySelector('.fill-handle');
+    if (old) old.remove();
+    const el = getCellEl(col, row);
+    if (!el) return;
+    const handle = document.createElement('div');
+    handle.className = 'fill-handle';
+    el.appendChild(handle);
+    let dragging = false, startRow = row;
+    const onDown = (e) => {
+      e.preventDefault(); e.stopPropagation();
+      dragging = true; startRow = row;
+      const over = (me) => {
+        if (!dragging) return;
+        const t = document.elementFromPoint(me.clientX, me.clientY);
+        if (t && t.classList.contains('cell')) {
+          const endR = +t.dataset.row;
+          document.querySelectorAll(`[data-col="${col}"]`).forEach(el2 => el2.style.outline = '');
+          for (let r = Math.min(startRow, endR); r <= Math.max(startRow, endR); r++) {
+            if (r === startRow) continue;
+            const ce = getCellEl(col, r);
+            if (ce) ce.style.outline = '1px dashed #217346';
+          }
+        }
+      };
+      const up = () => {
+        document.removeEventListener('mousemove', over);
+        document.removeEventListener('mouseup', up);
+        if (!dragging) return;
+        dragging = false;
+        document.querySelectorAll(`[data-col="${col}"]`).forEach(el2 => el2.style.outline = '');
+        const t = document.elementFromPoint(e.clientX, e.clientY);
+        const endR = t && t.classList.contains('cell') ? +t.dataset.row : startRow;
+        const src = getCell(col, startRow);
+        for (let r = Math.min(startRow, endR); r <= Math.max(startRow, endR); r++) {
+          if (r === startRow) continue;
+          const dst = getCell(col, r);
+          dst.value = src.value; dst.formula = src.formula;
+          dst.bold = src.bold; dst.italic = src.italic;
+          dst.underline = src.underline; dst.align = src.align;
+          renderCell(col, r);
+        }
+      };
+      document.addEventListener('mousemove', over);
+      document.addEventListener('mouseup', up);
+    };
+    handle.addEventListener('mousedown', onDown);
+  };
+
+  // Selection
+  const selectCell = (col, row) => {
+    if (selectedCell) {
+      const old = getCellEl(selectedCell.col, selectedCell.row);
+      if (old) old.classList.remove('selected', 'editing');
+    }
+    selectedCell = { col, row };
+    const el = getCellEl(col, row);
+    if (el) { el.classList.add('selected'); if (editing) el.classList.add('editing'); el.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+    const cell = getCell(col, row);
+    cellRef.textContent = cellKey(col, row);
+    formulaInput.value = cell.formula || cell.value;
+    updateFillHandle(col, row);
+    updateStatusBar();
+    closeContextMenu();
+  };
+
+  // Editing
+  const startEditing = () => {
+    if (!selectedCell) return;
+    editing = true;
+    const el = getCellEl(selectedCell.col, selectedCell.row);
+    if (el) { el.classList.add('editing'); }
+    const cell = getCell(selectedCell.col, selectedCell.row);
+    formulaInput.value = cell.formula || cell.value;
+    modeIndicator.textContent = 'Editar';
+    formulaInput.focus();
+  };
+
+  const finishEditing = (moveDown) => {
+    if (!editing || !selectedCell) return;
+    const col = selectedCell.col, row = selectedCell.row;
+    editing = false;
+    const el = getCellEl(col, row);
+    if (el) el.classList.remove('editing');
+    modeIndicator.textContent = 'Listo';
+    const cell = getCell(col, row);
+    const raw = formulaInput.value.trim();
+    if (raw.startsWith('=')) {
+      cell.formula = raw;
+      cell.value = evaluateFormula(raw);
+    } else {
+      cell.formula = '';
+      cell.value = raw;
+    }
+    renderCell(col, row);
+    updateStatusBar();
+    if (moveDown && row < ROWS) selectCell(col, row + 1);
+  };
+
+  // Formula evaluation
+  const evaluateFormula = (formula) => {
+    const f = formula.trim();
+    if (!f.startsWith('=')) return f;
+    try {
+      const funcMatch = f.match(/^=(\w+)\((.+)\)$/i);
+      if (funcMatch) {
+        const fn = funcMatch[1].toUpperCase();
+        const nums = resolveArgs(funcMatch[2]).filter(v => isNumeric(v)).map(Number);
+        switch (fn) {
+          case 'SUM': return nums.reduce((a, b) => a + b, 0);
+          case 'AVERAGE': return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0;
+          case 'COUNT': return nums.length;
+          case 'MAX': return nums.length ? Math.max(...nums) : 0;
+          case 'MIN': return nums.length ? Math.min(...nums) : 0;
+          default: return '#¿NOMBRE?';
+        }
+      }
+      let expr = f.substring(1).replace(/([A-Z])(\d+)/gi, (_, l, n) => {
+        const c = l.toUpperCase().charCodeAt(0) - 65, r = +n;
+        if (c >= 0 && c < COLS && r >= 1 && r <= ROWS) {
+          const v = parseFloat(getCell(c, r).value);
+          return isNaN(v) ? '0' : String(v);
+        }
+        return '0';
+      });
+      if (/^[\d+\-*/().%\s]+$/.test(expr)) return Function(`"use strict"; return (${expr})`)();
+      return '#¿NOMBRE?';
+    } catch (_) { return '#¡ERROR!'; }
+  };
+
+  const resolveArgs = (args) => {
+    const values = [];
+    for (const part of args.split(',')) {
+      const t = part.trim();
+      const rm = t.match(/^([A-Z])(\d+):([A-Z])(\d+)$/i);
+      if (rm) {
+        const [sc, sr, ec, er] = [rm[1].toUpperCase().charCodeAt(0) - 65, +rm[2], rm[3].toUpperCase().charCodeAt(0) - 65, +rm[4]];
+        for (let r = Math.min(sr, er); r <= Math.max(sr, er); r++)
+          for (let c = Math.min(sc, ec); c <= Math.max(sc, ec); c++) {
+            const v = getCell(c, r).value;
+            values.push(isNumeric(v) ? Number(v) : v);
+          }
+      } else {
+        const cr = t.match(/^([A-Z])(\d+)$/i);
+        if (cr) {
+          const c = cr[1].toUpperCase().charCodeAt(0) - 65, r = +cr[2];
+          const v = getCell(c, r).value;
+          values.push(isNumeric(v) ? Number(v) : v);
+        } else values.push(t);
+      }
+    }
+    return values;
+  };
+
+  // Formula bar events
+  formulaInput.addEventListener('input', () => {
+    if (selectedCell && editing) {
+      const el = getCellEl(selectedCell.col, selectedCell.row);
+      if (el) el.textContent = formulaInput.value;
+    }
+  });
+  formulaInput.addEventListener('focus', () => { if (!editing) { editing = true; modeIndicator.textContent = 'Editar'; } });
+  formulaInput.addEventListener('blur', () => { if (editing) finishEditing(); });
+  formulaInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); finishEditing(true); }
+  });
+  cellRef.addEventListener('click', () => formulaInput.focus());
+
+  // Grid events
+  gridTable.addEventListener('click', (e) => {
+    const c = e.target.closest('.cell');
+    if (!c) return;
+    const col = +c.dataset.col, row = +c.dataset.row;
+    if (editing) finishEditing();
+    selectCell(col, row);
+    formulaInput.focus();
+  });
+  gridTable.addEventListener('dblclick', (e) => {
+    const c = e.target.closest('.cell');
+    if (!c) return;
+    selectCell(+c.dataset.col, +c.dataset.row);
+    startEditing();
+  });
+  gridTable.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    const c = e.target.closest('.cell');
+    if (!c) return;
+    selectCell(+c.dataset.col, +c.dataset.row);
+    contextMenu.style.left = e.clientX + 'px';
+    contextMenu.style.top = e.clientY + 'px';
+    contextMenu.classList.add('open');
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (!selectedCell) return;
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (editing) finishEditing(true); else startEditing();
+      return;
+    }
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      if (editing) finishEditing();
+      const d = e.shiftKey ? -1 : 1;
+      const nc = selectedCell.col + d;
+      if (nc >= 0 && nc < COLS) selectCell(nc, selectedCell.row);
+      return;
+    }
+    if (e.key === 'Escape' && editing) { finishEditing(); return; }
+    if (e.key === 'Delete' && !editing && selectedCell) {
+      const cell = getCell(selectedCell.col, selectedCell.row);
+      cell.value = ''; cell.formula = '';
+      renderCell(selectedCell.col, selectedCell.row);
+      formulaInput.value = '';
+      updateStatusBar();
+      return;
+    }
+    if (!editing && e.key.startsWith('Arrow')) {
+      e.preventDefault();
+      const map = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
+      const [dc, dr] = map[e.key];
+      selectCell(Math.max(0, Math.min(COLS - 1, selectedCell.col + dc)), Math.max(1, Math.min(ROWS, selectedCell.row + dr)));
+    }
+  });
+
+  // Context menu
+  const closeContextMenu = () => contextMenu.classList.remove('open');
+  contextMenu.addEventListener('click', (e) => {
+    const item = e.target.closest('.menu-item');
+    if (!item) return;
+    const action = item.dataset.action;
+    if (!selectedCell) return;
+    switch (action) {
+      case 'cut': {
+        clipboard = getCell(selectedCell.col, selectedCell.row).value;
+        const c = getCell(selectedCell.col, selectedCell.row);
+        c.value = ''; c.formula = '';
+        renderCell(selectedCell.col, selectedCell.row);
+        updateStatusBar(); break;
+      }
+      case 'copy':
+        clipboard = getCell(selectedCell.col, selectedCell.row).value;
+        break;
+      case 'paste':
+        if (clipboard !== null) {
+          const c = getCell(selectedCell.col, selectedCell.row);
+          c.value = clipboard; c.formula = '';
+          renderCell(selectedCell.col, selectedCell.row);
+          formulaInput.value = clipboard;
+          updateStatusBar();
+        }
+        break;
+      case 'clear': {
+        const c = getCell(selectedCell.col, selectedCell.row);
+        c.value = ''; c.formula = '';
+        renderCell(selectedCell.col, selectedCell.row);
+        formulaInput.value = '';
+        updateStatusBar(); break;
+      }
+      case 'deleteAll':
+        for (let r = 1; r <= ROWS; r++)
+          for (let c = 0; c < COLS; c++) {
+            const cell = getCell(c, r);
+            cell.value = ''; cell.formula = ''; cell.bold = false; cell.italic = false;
+            cell.underline = false; cell.align = 'left';
+            renderCell(c, r);
+          }
+        formulaInput.value = '';
+        updateStatusBar();
+        break;
+    }
+    closeContextMenu();
+  });
+  document.addEventListener('click', (e) => { if (!contextMenu.contains(e.target)) closeContextMenu(); });
+
+  // Status bar
+  const updateStatusBar = () => {
+    const nums = [];
+    for (let r = 1; r <= ROWS; r++)
+      for (let c = 0; c < COLS; c++) {
+        const v = getCell(c, r).value;
+        if (isNumeric(v)) nums.push(Number(v));
+      }
+    const sum = nums.reduce((a, b) => a + b, 0);
+    const count = nums.length;
+    const avg = count ? sum / count : 0;
+    sumIndicator.innerHTML = `<i class="fas fa-equals"></i> Suma = ${sum}`;
+    countIndicator.innerHTML = `<i class="fas fa-hashtag"></i> Cuenta = ${count}`;
+    avgIndicator.innerHTML = `<i class="fas fa-chart-line"></i> Promedio = ${avg.toFixed(2)}`;
+  };
+
+  // Ribbon
+  document.querySelector('.ribbon-body').addEventListener('click', (e) => {
+    const btn = e.target.closest('.ribbon-btn');
+    if (!btn || !selectedCell) return;
+    const cell = getCell(selectedCell.col, selectedCell.row);
+    switch (btn.title) {
+      case 'Negrita': cell.bold = !cell.bold; renderCell(selectedCell.col, selectedCell.row); break;
+      case 'Cursiva': cell.italic = !cell.italic; renderCell(selectedCell.col, selectedCell.row); break;
+      case 'Subrayado': cell.underline = !cell.underline; renderCell(selectedCell.col, selectedCell.row); break;
+      case 'Alinear a la izquierda': cell.align = 'left'; renderCell(selectedCell.col, selectedCell.row); break;
+      case 'Centrar': cell.align = 'center'; renderCell(selectedCell.col, selectedCell.row); break;
+      case 'Alinear a la derecha': cell.align = 'right'; renderCell(selectedCell.col, selectedCell.row); break;
+      case 'SUM': {
+        const col = selectedCell.col, row = selectedCell.row;
+        let s = row; while (s > 1 && isNumeric(getCell(col, s - 1).value)) s--;
+        let e2 = row; while (e2 < ROWS && isNumeric(getCell(col, e2 + 1).value)) e2++;
+        if (s < 1) s = 1; if (e2 > ROWS) e2 = ROWS;
+        const f = `=SUM(${cellKey(col, s)}:${cellKey(col, e2)})`;
+        cell.formula = f; cell.value = evaluateFormula(f);
+        renderCell(col, row); formulaInput.value = f; updateStatusBar();
+        break;
+      }
+    }
+  });
+
+  // Sheet tabs
+  sheetTabs.addEventListener('click', (e) => {
+    const tab = e.target.closest('.sheet-tab');
+    if (!tab) return;
+    if (e.target.closest('.sheet-close')) {
+      if (sheetTabs.children.length > 1) tab.remove();
+      return;
+    }
+    sheetTabs.querySelectorAll('.sheet-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+  document.querySelector('.sheet-add-btn').addEventListener('click', () => {
+    sheetCount++;
+    const tab = document.createElement('button');
+    tab.className = 'sheet-tab';
+    tab.innerHTML = `<i class="fas fa-file-excel sheet-icon"></i><span class="sheet-name">Hoja${sheetCount}</span><span class="sheet-close">&times;</span>`;
+    sheetTabs.querySelectorAll('.sheet-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    sheetTabs.appendChild(tab);
+  });
+
+  // Initial data
+  const initData = () => {
+    const raw = {
+      'A1': 'Producto', 'B1': 'Enero', 'C1': 'Febrero', 'D1': 'Marzo', 'E1': 'Total',
+      'A2': 'Laptop', 'B2': '8000', 'C2': '7500', 'D2': '9200',
+      'A3': 'Mouse', 'B3': '1200', 'C3': '1500', 'D3': '1100',
+      'A4': 'Teclado', 'B4': '2500', 'C4': '2200', 'D4': '2800',
+      'A5': 'Monitor', 'B5': '4500', 'C5': '4800', 'D5': '4200',
+      'A7': 'RESUMEN', 'A8': 'Total General', 'A9': 'Promedio'
+    };
+    for (const [k, v] of Object.entries(raw)) {
+      const p = parseCellKey(k);
+      if (p) getCell(p.col, p.row).value = v;
+    }
+    const boldCells = ['A1','B1','C1','D1','E1','A7'];
+    for (const k of boldCells) {
+      const p = parseCellKey(k);
+      if (p) getCell(p.col, p.row).bold = true;
+    }
+    const formulas = {
+      'E2': '=SUM(B2:D2)', 'E3': '=SUM(B3:D3)', 'E4': '=SUM(B4:D4)', 'E5': '=SUM(B5:D5)',
+      'B8': '=SUM(E2:E5)', 'B9': '=AVERAGE(B2:D5)'
+    };
+    for (const [k, f] of Object.entries(formulas)) {
+      const p = parseCellKey(k);
+      if (p) { const c = getCell(p.col, p.row); c.formula = f; c.value = evaluateFormula(f); }
+    }
+  };
+
+  buildGrid();
+  initData();
+  renderAllCells();
+  selectCell(1, 1);
+  updateStatusBar();
+});
+</script>
+</body>
+</html>
