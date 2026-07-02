@@ -2265,8 +2265,6 @@ section.module-section {
   background: var(--primary-hover);
 }
 
-.nav-simulator { color: var(--accent) !important; font-weight: 600 !important; }
-
 .achievement-row {
   display: flex;
   gap: 0.6rem;
