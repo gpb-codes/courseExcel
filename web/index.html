@@ -31,7 +31,6 @@
     <div class="header-actions">
       <button class="header-btn" id="curriculumToggle" aria-label="Temario" title="Ver temario"><i class="fas fa-list"></i></button>
       <button class="header-btn" id="searchToggle" aria-label="Buscar (Ctrl+K)" title="Buscar (Ctrl+K)"><i class="fas fa-search"></i></button>
-      <button class="header-btn" id="focusBtn" aria-label="Modo lectura" title="Modo lectura"><i class="fas fa-book-open"></i></button>
       <button class="header-btn" id="themeToggle" aria-label="Tema" title="Tema"><span id="themeIcon"><i class="fas fa-moon"></i><i class="fas fa-sun"></i></span></button>
       <button class="menu-btn" id="menuToggle" aria-label="Menú"><span></span><span></span><span></span></button>
     </div>
@@ -50,12 +49,6 @@
   </div>
 </div>
 
-<!-- ===== FOCUS BAR ===== -->
-<div class="focus-bar" id="focusBar">
-  <button onclick="exitFocus()" title="Salir del modo lectura"><i class="fas fa-arrow-left"></i></button>
-  <span class="focus-title" id="focusTitle">Modo lectura</span>
-  <button onclick="document.getElementById('focusBar').querySelector('button').click();window.print();" title="Imprimir"><i class="fas fa-print"></i></button>
-</div>
 
 <!-- ===== HERO ===== -->
 <section class="hero" id="hero">
@@ -64,11 +57,6 @@
     <div class="hero-badge"><i class="fas fa-graduation-cap"></i> Ansuz Academy</div>
     <h1>Excel <span class="gradient-text">desde Cero</span><span class="accent-dot">.</span></h1>
     <p class="hero-subtitle" id="heroSubtitle"></p>
-    <div class="hero-stats">
-      <div class="hero-stat"><div class="num" data-target="13">0</div><div class="label">Módulos</div></div>
-      <div class="hero-stat"><div class="num" data-target="68">0</div><div class="label">Temas</div></div>
-      <div class="hero-stat"><div class="num" data-target="100">0</div><div class="label">% Práctico</div></div>
-    </div>
     <div class="hero-cta">
       <button class="btn-primary" onclick="document.getElementById('modulo-1').scrollIntoView({behavior:'smooth'})"><i class="fas fa-play"></i> Empezar curso</button>
       <button class="btn-secondary" onclick="toggleCurriculum()"><i class="fas fa-list"></i> Ver temario</button>
@@ -80,18 +68,11 @@
       <span><i class="fas fa-layer-group"></i> 13 módulos</span>
       <span><i class="fas fa-file-alt"></i> 68 temas</span>
       <span><i class="fas fa-signal"></i> Principiante a intermedio</span>
-    </div>
-    <div class="hero-enroll-bar">
       <span><i class="fas fa-users"></i> <strong>5,000+</strong> estudiantes</span>
       <span><i class="fas fa-star"></i> <strong>4.8</strong> valoración</span>
       <span><i class="fas fa-sync-alt"></i> <strong>Actualizado</strong> 2025</span>
     </div>
-    <div class="course-highlights">
-      <div class="hl-item"><div class="hl-num">13</div><div class="hl-label">Módulos</div></div>
-      <div class="hl-item"><div class="hl-num">68</div><div class="hl-label">Temas</div></div>
-      <div class="hl-item"><div class="hl-num">100%</div><div class="hl-label">Práctico</div></div>
-      <div class="hl-item"><div class="hl-num">🎓</div><div class="hl-label">Certificado</div></div>
-    </div>
+
   </div>
   <div class="scroll-indicator"><i class="fas fa-expand"></i></div>
 </section>
@@ -169,7 +150,6 @@
       <div class="feature-card"><div class="feature-icon"><i class="fas fa-rocket"></i></div><h4>100% Práctico</h4><p>Nada de teoría aburrida. Cada tema tiene ejercicios que resuelves paso a paso.</p></div>
        <div class="feature-card"><div class="feature-icon"><i class="fas fa-layer-group"></i></div><h4>Estructura Progresiva</h4><p>De principiante a avanzado en 13 módulos. Cada tema construye sobre el anterior.</p></div>
       <div class="feature-card"><div class="feature-icon"><i class="fas fa-mobile-alt"></i></div><h4>Acceso Ilimitado</h4><p>Estudia desde cualquier dispositivo, a tu ritmo, sin fechas límite.</p></div>
-      <div class="feature-card"><div class="feature-icon"><i class="fas fa-certificate"></i></div><h4>Certificado Incluido</h4><p>Al completar el curso obtienes un certificado digital de Ansuz Academy.</p></div>
     </div>
   </div>
 </section>
@@ -3378,10 +3358,6 @@ End Sub</code></pre><p>Para ejecutar cualquiera de estas: coloca el cursor dentr
       <div class="faq-body"><div class="faq-body-inner">El curso tiene aproximadamente 16 horas de contenido distribuido en 68 temas y 13 módulos. Puedes avanzar a tu ritmo: algunos estudiantes lo completan en 2-3 semanas, otros en un mes.</div></div>
     </div>
     <div class="faq-item">
-      <div class="faq-header" onclick="this.parentElement.classList.toggle('active')"><span>¿Cómo obtengo el certificado?</span><i class="fas fa-chevron-down"></i></div>
-      <div class="faq-body"><div class="faq-body-inner">Al completar el 100% del curso (marcar todos los temas como completados), aparecerá automáticamente un certificado digital con tu nombre. Puedes imprimirlo o guardarlo como PDF.</div></div>
-    </div>
-    <div class="faq-item">
       <div class="faq-header" onclick="this.parentElement.classList.toggle('active')"><span>¿Puedo estudiar sin conexión a internet?</span><i class="fas fa-chevron-down"></i></div>
       <div class="faq-body"><div class="faq-body-inner">Sí. Cada módulo está disponible en PDF para descargar e imprimir. Además, el sitio web funciona como PWA (Progressive Web App) — puedes instalarlo en tu dispositivo y acceder sin conexión.</div></div>
     </div>
@@ -3439,21 +3415,6 @@ End Sub</code></pre><p>Para ejecutar cualquiera de estas: coloca el cursor dentr
   </div>
 </footer>
 
-<!-- ===== CERTIFICATE OVERLAY ===== -->
-<div class="cert-overlay" id="certOverlay">
-  <div class="certificate">
-    <div class="cert-badge">🎓</div>
-    <div class="cert-title">Ansuz Academy</div>
-    <div class="cert-sub">Certificado de Finalización</div>
-    <div class="cert-name" id="certName">—</div>
-    <div class="cert-msg">Ha completado exitosamente el curso <strong>Excel desde Cero</strong> de Ansuz Academy, demostrando competencia en los 13 módulos y 68 temas del programa.</div>
-    <div class="cert-footer"><span>Ansuz Academy</span><span id="certDate">2025</span></div>
-    <div class="cert-actions">
-      <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
-      <button class="btn-close" onclick="closeCert()">Cerrar</button>
-    </div>
-  </div>
-</div>
 
 <!-- ===== BACK TO TOP ===== -->
 <button class="back-to-top" id="backToTop" aria-label="Volver arriba">
@@ -4069,7 +4030,7 @@ End Sub</code></pre><p>Para ejecutar cualquiera de estas: coloca el cursor dentr
     launchConfetti();
   }
 
-  function closeCert() { document.getElementById('certOverlay').classList.remove('open'); }
+  //
 
   function launchConfetti() {
     const cont = document.createElement('div');
@@ -4090,35 +4051,6 @@ End Sub</code></pre><p>Para ejecutar cualquiera de estas: coloca el cursor dentr
     }
     setTimeout(() => cont.remove(), 6000);
   }
-
-  /* =============================================================
-     FOCUS MODE
-     ============================================================= */
-  let inFocus = false;
-
-  document.getElementById('focusBtn').addEventListener('click', () => {
-    inFocus = !inFocus;
-    document.body.classList.toggle('focus-mode', inFocus);
-    if (inFocus) {
-      document.getElementById('focusTitle').textContent = 'Modo lectura';
-    }
-  });
-
-  function exitFocus() {
-    inFocus = false;
-    document.body.classList.remove('focus-mode');
-  }
-
-  // Track expanded cards for focus mode title
-  document.addEventListener('click', function(e) {
-    if (inFocus) {
-      const overlay = document.getElementById('fullscreenOverlay');
-      if (overlay.classList.contains('open')) {
-        const t = overlay.querySelector('h2')?.textContent;
-        if (t) document.getElementById('focusTitle').textContent = t;
-      }
-    }
-  });
 
   /* =============================================================
      NAV - Scroll spy
@@ -4183,7 +4115,7 @@ End Sub</code></pre><p>Para ejecutar cualquiera de estas: coloca el cursor dentr
       e.preventDefault(); const h=document.getElementById('kbHint'); h.classList.add('visible');
       clearTimeout(window._kbTimer); window._kbTimer = setTimeout(()=>h.classList.remove('visible'), 3500);
     }
-    if (e.key === 'Escape') { if (searchOpen) closeSearch(); if (document.querySelector('.fullscreen-overlay.open')) closeFullscreen(); if (drawer.classList.contains('open')) closeDrawer(); if (document.querySelector('.cert-overlay.open')) closeCert(); }
+    if (e.key === 'Escape') { if (searchOpen) closeSearch(); if (document.querySelector('.fullscreen-overlay.open')) closeFullscreen(); if (drawer.classList.contains('open')) closeDrawer(); }
   });
 
   // Show KB hint once
@@ -4225,8 +4157,7 @@ End Sub</code></pre><p>Para ejecutar cualquiera de estas: coloca el cursor dentr
   window.toggleTopic = toggleTopic;
   window.expandAll = expandAll;
   window.collapseAll = collapseAll;
-  window.exitFocus = exitFocus;
-  window.closeCert = closeCert;
+  
 
 })();
 </script>

@@ -593,75 +593,8 @@
   }
 
   /* ============================================================
-     7. CERTIFICATE GENERATION
+     7. unused
      ============================================================ */
-
-  window.showCertificateForm = function () {
-    const overlay = ensureOverlay('certFormOverlay');
-    overlay.innerHTML = `
-      <div class="overlay-content" style="max-width:450px">
-        <button class="overlay-close" onclick="closeCertificateForm()"><i class="fas fa-times"></i></button>
-        <h2 style="margin-bottom:0.75rem"><i class="fas fa-certificate" style="color:var(--gold-500)"></i> Generar Certificado</h2>
-        <label style="font-size:0.85rem;color:var(--text-secondary);display:block;margin-bottom:0.3rem">Nombre completo:</label>
-        <input type="text" id="certNameInput" placeholder="Ej: Juan P\u00E9rez" style="width:100%;padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card-bg);color:var(--text);font-size:0.9rem;outline:none;margin-bottom:1rem">
-        <button class="fs-continue-btn" onclick="generateCertificate(document.getElementById('certNameInput').value)" style="width:100%"><i class="fas fa-file-pdf"></i> Generar y Descargar</button>
-      </div>`;
-    showOverlay(overlay);
-    setTimeout(() => {
-      const inp = document.getElementById('certNameInput');
-      if (inp) inp.focus();
-    }, 100);
-  };
-
-  window.closeCertificateForm = function () {
-    hideOverlay('certFormOverlay');
-  };
-
-  window.generateCertificate = function (name) {
-    name = (name || '').trim();
-    if (!name) {
-      alert('Por favor ingresa tu nombre completo.');
-      return;
-    }
-    const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
-    const win = window.open('', '_blank', 'width=800,height=600');
-    if (!win) {
-      alert('Permite ventanas emergentes para generar el certificado.');
-      return;
-    }
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Certificado - Ansuz Academy</title>
-      <style>
-        @page{margin:0}body{margin:0;padding:0;font-family:Georgia,serif;color:#1a0630;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f5f0eb}
-        .cert-wrap{width:750px;padding:2.5rem;text-align:center;background:#fff;border:8px solid #d4a843;box-shadow:0 4px 30px rgba(0,0,0,0.1)}
-        .cert-border{position:relative;padding:2rem;border:2px solid #d4a843}
-        h1{font-size:2rem;margin:0 0 0.25rem;letter-spacing:2px;color:#c9952a;font-weight:800}
-        .sub{font-size:0.85rem;color:#9a8baa;margin-bottom:1.5rem;text-transform:uppercase;letter-spacing:3px}
-        h2{font-size:1.3rem;color:#5a4d6b;font-weight:400;margin-bottom:0.5rem}
-        .name{font-size:2rem;font-weight:800;color:#1a0630;margin:0.5rem 0;border-bottom:2px solid #d4a843;display:inline-block;padding:0 1rem 0.25rem}
-        .course{font-size:1.1rem;color:#5a4d6b;margin:0.75rem 0}
-        .date{font-size:0.85rem;color:#9a8baa;margin-top:1rem}
-        .seal{width:70px;height:70px;border-radius:50%;border:3px solid #d4a843;display:flex;align-items:center;justify-content:center;margin:1rem auto;font-size:1.8rem;color:#c9952a}
-        .sig{display:flex;justify-content:space-between;align-items:end;margin-top:1.5rem;padding-top:0.5rem}
-        .sig-line{width:200px;border-top:1px solid #9a8baa;padding-top:0.25rem;font-size:0.75rem;color:#9a8baa}
-        @media print{body{background:#fff}.cert-wrap{box-shadow:none;border:8px solid #d4a843}}
-      </style></head><body>
-      <div class="cert-wrap"><div class="cert-border">
-        <h1>Ansuz Academy</h1>
-        <div class="sub">Certificado de Finalizaci\u00F3n</div>
-        <h2>Otorgado a:</h2>
-        <div class="name">${escapeHtml(name)}</div>
-        <div class="course">Por completar el curso <strong>\u201CExcel desde Cero\u201D</strong></div>
-        <div class="date">${today}</div>
-        <div class="seal"><i class="fas fa-star" style="display:none"></i>\u2605</div>
-        <div class="sig"><div class="sig-line">Firma del instructor</div><div class="sig-line">Ansuz Academy</div></div>
-      </div></div></body></html>`);
-    win.document.close();
-    setTimeout(() => {
-      win.focus();
-      win.print();
-      setTimeout(() => win.close(), 500);
-    }, 500);
-  };
 
   /* ============================================================
      8. CODE COPY BUTTONS
@@ -733,10 +666,7 @@
       ['Ctrl+K', 'Buscar'],
       ['1\u20139', 'Ir al m\u00F3dulo N'],
       ['\u2190 \u2192', 'Tema anterior/siguiente (fullscreen)'],
-      ['F', 'Modo lectura'],
       ['D', 'Alternar tema'],
-      ['P', 'Abrir progreso'],
-      ['G', 'Abrir glosario']
     ];
     overlay.innerHTML = `
       <div class="overlay-content" style="max-width:450px">
@@ -774,24 +704,9 @@
       if (sec) sec.scrollIntoView({ behavior: 'smooth' });
       return;
     }
-    if (e.key === 'f' || e.key === 'F') {
-      e.preventDefault();
-      document.getElementById('focusBtn')?.click();
-      return;
-    }
     if (e.key === 'd' || e.key === 'D') {
       e.preventDefault();
       document.getElementById('themeToggle')?.click();
-      return;
-    }
-    if (e.key === 'p' || e.key === 'P') {
-      e.preventDefault();
-      openDashboard();
-      return;
-    }
-    if (e.key === 'g' || e.key === 'G') {
-      e.preventDefault();
-      openGlossary();
       return;
     }
     if (e.key === '?' && !e.target.matches('input,textarea,select')) {
@@ -829,33 +744,6 @@
   }
 
   function initCounterAnimations() {
-    let counted = false;
-    const obs = new IntersectionObserver(
-      entries => {
-        entries.forEach(e => {
-          if (e.isIntersecting && !counted) {
-            counted = true;
-            e.target.querySelectorAll('.num').forEach(el => {
-              const target = parseInt(el.dataset.target);
-              if (!target || parseInt(el.textContent) === target) return;
-              el.textContent = '0';
-              const dur = 2000;
-              const start = performance.now();
-              function update(now) {
-                const p = Math.min((now - start) / dur, 1);
-                el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target);
-                if (p < 1) requestAnimationFrame(update);
-              }
-              requestAnimationFrame(update);
-            });
-            obs.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-    const stats = document.querySelector('.hero-stats');
-    if (stats) obs.observe(stats);
   }
 
   /* ============================================================
@@ -869,56 +757,7 @@
     initCounterAnimations();
     updateQuizBadges();
     updateAssessmentBadge();
-    addExtraHeaderButtons();
-
-    const totalTopics = 34;
-
-    function doneTopics() {
-      let c = 0;
-      for (let m = 1; m <= 9; m++) {
-        document.querySelectorAll(`.topic-card[data-module="${m}"]`).forEach(card => {
-          if (card.querySelector('.card-check')?.classList.contains('done')) c++;
-        });
-      }
-      return c;
-    }
-
-    function checkAll() {
-      if (doneTopics() >= totalTopics) {
-        showCertificateForm();
-      }
-    }
-
-    const progObs = new MutationObserver(checkAll);
-    document.querySelectorAll('.card-check').forEach(chk => {
-      progObs.observe(chk, { attributes: true, attributeFilter: ['class'] });
-    });
   });
-
-  function addExtraHeaderButtons() {
-    const actions = document.querySelector('.header-actions');
-    if (!actions) return;
-    if (!document.getElementById('dashBtnHeader')) {
-      const dash = document.createElement('button');
-      dash.id = 'dashBtnHeader';
-      dash.className = 'header-btn';
-      dash.innerHTML = '<i class="fas fa-chart-simple"></i>';
-      dash.title = 'Progreso (P)';
-      dash.setAttribute('aria-label', 'Progreso');
-      dash.onclick = openDashboard;
-      actions.insertBefore(dash, document.getElementById('focusBtn'));
-    }
-    if (!document.getElementById('glossaryBtnHeader')) {
-      const glos = document.createElement('button');
-      glos.id = 'glossaryBtnHeader';
-      glos.className = 'header-btn';
-      glos.innerHTML = '<i class="fas fa-book"></i>';
-      glos.title = 'Glosario (G)';
-      glos.setAttribute('aria-label', 'Glosario');
-      glos.onclick = openGlossary;
-      actions.insertBefore(glos, document.getElementById('focusBtn'));
-    }
-  }
 
   /* ============================================================
      12. OVERLAY STYLES (injected once)
