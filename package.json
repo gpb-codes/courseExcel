@@ -1,0 +1,12 @@
+{
+  "name": "curso-excel-profesional",
+  "version": "1.0.0",
+  "description": "Curso de Excel Profesional - SPA",
+  "scripts": {
+    "start": "serve web/ -l $PORT",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "dependencies": {
+    "serve": "^14.2.0"
+  }
+}

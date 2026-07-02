@@ -1,0 +1,9 @@
+{
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "serve web/ -l $PORT",
+    "healthcheckPath": "/"
+  }
+}
